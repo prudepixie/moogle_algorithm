@@ -5,12 +5,11 @@ require_relative 'lib/reader.rb'
 
 class SearchEngine
   include Reader
-  attr_accessor :folder, :books
+  attr_accessor :books, :density_hash
   # call read_books and set up your data structures to make it easier when you call search
   def initialize (folder)
-    @folder = folder
-    @books = read_books(@folder)
-
+    @books = read_books(folder)
+    @density_hash = {}
 
   end
 
@@ -19,17 +18,17 @@ class SearchEngine
     read_all_books(folder)
   end
 
+
   def search(query) # Implement this search, return an array of book names in order of relatedness
     # automatically returns an array #keys
-    book_info = {}
-    books_names = book_info.keys
-    binding.pry
-    @books.each do |key,value|
-      value = book_info[key]
-      if value.include?(query)
-        book_info[:key] += 1
-      end
-
+    @books.each do |k,v|
+      density = v.count(query).to_f / v.length.to_f
+      @density_hash[k] = density
     end
+    result = @density_hash.sort_by{|k,v| v}.reverse.map(&:first)
+    # the result is an array of all title sorted
   end
 end
+
+
+
